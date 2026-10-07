@@ -43,3 +43,12 @@ example : ∃ x, ![x, x, x] = (v / w) := by
   ---
 
 end Ex2
+
+-- 1.4
+example (e : Fin 2 → ℝ) (h : ∀ v, v + e = v) : e 0 = 0 ∧ e 1 = 0 := by
+  have h0 := h ![0, 0]
+  have hx := congrFun h0 0
+  simp at hx
+  have hy := congrFun h0 1
+  simp at hy
+  exact ⟨hx, hy⟩
