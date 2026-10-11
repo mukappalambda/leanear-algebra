@@ -1,12 +1,14 @@
 import Mathlib.Data.Fin.VecNotation
 import Mathlib.Basic.Real.Basic
 import Mathlib.Tactic.Linarith
+import Mathlib.Tactic.Ring
 
 set_option linter.style.header false
 set_option linter.style.whitespace false
 
 #check funext
 
+-- 1.1
 -- The trick is to frame each problem as a statement
 -- - points are parallel: statement is true
 -- - points are not parallel: false
@@ -52,3 +54,37 @@ example (e : Fin 2 → ℝ) (h : ∀ v, v + e = v) : e 0 = 0 ∧ e 1 = 0 := by
   have hy := congrFun h0 1
   simp at hy
   exact ⟨hx, hy⟩
+
+-- 1.7
+namespace P17
+
+#check sub_div
+#check funext
+
+variable {n : ℕ} (a b : Fin n → ℝ)
+example : (a + b) / 2 = a + (b - a) / 2 := by
+  let m1 := (a + b) / 2
+  let m2 := a + (b - a) / 2
+  -- have : ∀ i < n, m1 i = m2 i := by sorry
+  have : ∀ i : Fin n, m1 i = m2 i := by
+    intro i
+    calc
+      m1 i = ((a + b) / 2) i := by rfl
+      _ = (a/2 + b/2) i := by apply add_div
+      _ = (a/2) i + (b/2) i := by simp
+      _ = (a i) / 2 + (b i) / 2 := by simp
+      _ = (a i) / 2 + (b i) / 2 + (a i) / 2  - (a i) / 2 := by simp
+      _ = (a i) / 2 + (a i) / 2 + (b i) / 2  - (a i) / 2 := by rw [add_right_comm]
+      _ = (a i) + (b i) / 2 - (a i) / 2 := by simp
+      _ = (a i) + (b i - a i) / 2 := by rw [add_sub_assoc, ← sub_div]
+      _ = (a + (b - a) / 2) i := by simp
+      _ = m2 i := rfl
+  exact funext this
+
+-- using ring
+example : (a + b) / 2 = a + (b - a) / 2 := by
+  funext i
+  change (a i + b i) / 2 = a i + (b i - a i) / 2
+  ring
+
+end P17
